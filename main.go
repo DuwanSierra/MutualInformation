@@ -2,33 +2,25 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
 	"log"
 	"math"
+	"os"
 )
 
 func entropy(filename string) (float64, error) {
-	bytes, err := ioutil.ReadFile(filename)
+	bytes, err := os.ReadFile(filename)
 	if err != nil {
 		return 0, err
 	}
 
-	var bits []int
-	for _, b := range bytes {
-		for i := 7; i >= 0; i-- {
-			bit := (b >> uint(i)) & 1
-			bits = append(bits, int(bit))
-		}
-	}
-
 	counts := make(map[int]int)
-	for _, bit := range bits {
-		counts[bit]++
+	for _, b := range bytes {
+		counts[int(b)]++
 	}
 
 	var entropy float64
 	for _, count := range counts {
-		p := float64(count) / float64(len(bits))
+		p := float64(count) / float64(len(bytes))
 		entropy -= p * math.Log2(p)
 	}
 
@@ -36,12 +28,12 @@ func entropy(filename string) (float64, error) {
 }
 
 func jointEntropy(filename1, filename2 string) (float64, error) {
-	bytes1, err := ioutil.ReadFile(filename1)
+	bytes1, err := os.ReadFile(filename1)
 	if err != nil {
 		return 0, err
 	}
 
-	bytes2, err := ioutil.ReadFile(filename2)
+	bytes2, err := os.ReadFile(filename2)
 	if err != nil {
 		return 0, err
 	}
@@ -55,24 +47,15 @@ func jointEntropy(filename1, filename2 string) (float64, error) {
 		bytes2 = append(bytes2, padding...)
 	}
 
-	var jointBits []int
-	for i := range bytes1 {
-		for j := 7; j >= 0; j-- {
-			bit1 := (bytes1[i] >> uint(j)) & 1
-			bit2 := (bytes2[i] >> uint(j)) & 1
-			jointBit := int(bit1<<1 | bit2) // Convert jointBit to int
-			jointBits = append(jointBits, jointBit)
-		}
-	}
-
 	counts := make(map[int]int)
-	for _, bit := range jointBits {
-		counts[bit]++
+	for i := range bytes1 {
+		jointByte := int(bytes1[i])<<8 | int(bytes2[i])
+		counts[jointByte]++
 	}
 
 	var entropy float64
 	for _, count := range counts {
-		p := float64(count) / float64(len(jointBits))
+		p := float64(count) / float64(len(bytes1))
 		entropy -= p * math.Log2(p)
 	}
 
