@@ -63,8 +63,8 @@ func jointEntropy(filename1, filename2 string) (float64, error) {
 }
 
 func main() {
-	pathFile1 := "input_image.jpg"
-	pathFile2 := "input_image_2.jpg"
+	pathFile1 := "input_image_2.jpg"
+	pathFile2 := "input_image_3.jpg"
 	entropy1, err := entropy(pathFile1)
 	if err != nil {
 		log.Fatal(err)
@@ -81,12 +81,7 @@ func main() {
 	}
 
 	mutualInformation := entropy1 + entropy2 - jointEntropy
-	/*
-		Una comprensión correcta:
-			Variables similares⟹MI es máximo.
-			Sin cambios en las variables⟹MI es mínimo (MI es cero)
-	*/
-	fmt.Println("Entropy 1:", entropy1)
-	fmt.Println("Entropy 2:", entropy2)
-	fmt.Println("Mutual Information:", mutualInformation)
+	//Convert mutual information to percentage inside the range [0, 100]
+	mutualInformation = mutualInformation / math.Max(entropy1, entropy2) * 100
+	fmt.Println("Mutual Information:", mutualInformation, "%")
 }
