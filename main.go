@@ -63,8 +63,8 @@ func jointEntropy(filename1, filename2 string) (float64, error) {
 }
 
 func main() {
-	pathFile1 := "input_image_2.jpg"
-	pathFile2 := "input_image_3.jpg"
+	pathFile1 := "audio1.weba"
+	pathFile2 := "audio3.weba"
 	entropy1, err := entropy(pathFile1)
 	if err != nil {
 		log.Fatal(err)
@@ -81,7 +81,10 @@ func main() {
 	}
 
 	mutualInformation := entropy1 + entropy2 - jointEntropy
-	//Convert mutual information to percentage inside the range [0, 100]
-	mutualInformation = mutualInformation / math.Max(entropy1, entropy2) * 100
-	fmt.Println("Mutual Information:", mutualInformation, "%")
+	maxEntropy := math.Min(entropy1, entropy2)
+	percentage := (mutualInformation / maxEntropy) * 100
+	fmt.Printf("Entropy of %s: %.2f\n", pathFile1, entropy1)
+	fmt.Printf("Entropy of %s: %.2f\n", pathFile2, entropy2)
+	fmt.Printf("Joint Entropy: %.2f\n", jointEntropy)
+	fmt.Printf("Mutual Information: %.2f%%\n", percentage)
 }
